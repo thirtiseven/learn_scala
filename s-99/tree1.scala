@@ -30,6 +30,7 @@ object Node {
 }
 
 object Tree {
+
   def cBalanced[T](nodes: Int, value: T): List[Tree[T]] = nodes match {
     case n if n < 1 => List(End)
     case n if n % 2 == 1 => {
@@ -42,9 +43,26 @@ object Tree {
       lesserSubtrees.flatMap(l => greaterSubtrees.flatMap(g => List(Node(value, l, g), Node(value, g, l))))
     }
   }
+
   def fromList[T](ls: List[T])(implicit ev: T => Ordered[T]): Tree[T] = {
     ls.foldLeft(End: Tree[T])((t, x) => t.addValue(x))
   }
+
+  def symmetricBalancedTrees[T](nodes: Int, value: T): List[Tree[T]] = {
+    cBalanced(nodes, value).filter(_.isSymmetric)
+  }
+
+  def hbalTrees[T](height: Int, value: T): List[Tree[T]] = height match {
+    case n if n < 1 => List(End)
+    case 1 => List(Node(value))
+    case n => {
+      val fullHeight = hbalTrees(n - 1, value)
+      val shortHeight = hbalTrees(n - 2, value)
+      fullHeight.flatMap((l) => fullHeight.map((r) => Node(value, l, r))) :::
+      fullHeight.flatMap((f) => short.flatMap((s) => List(Node(value, f, s), Node(value, s, f))))
+    }
+  }
+
 }
 
 // println(Tree.cBalanced(4, "x"))
